@@ -1,4 +1,9 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class VideoTags {
     private static final String[] video1 = new String[] {
@@ -54,5 +59,30 @@ public class VideoTags {
         tags.put("video10.mp4", video10);
         tags.put("video11.mp4", video11);
         tags.put("video12.mp4", video12);
+    }
+
+    public static HashMap<String, List<String>> getUserInterests(String filename) throws IOException
+    {
+        HashMap<String, List<String>> result = new HashMap<>();
+        List<String> lines = Files.readAllLines(Paths.get(filename));
+        int userCount = lines.size() / 2;
+        for (int i = 0; i < userCount; i++)
+        {
+            String name = lines.get(i * 2).split(":")[1].trim();
+            List<String> interests = new ArrayList<>();
+            String[] videos = lines.get(i * 2 + 1).split(":")[1].split(",");
+            for (String video : videos)
+            {
+                for (String tag : tags.get(video) )
+                {
+                    if (!interests.contains(tag))
+                    {
+                        interests.add(tag);
+                    }
+                }
+            }
+            result.put(name, interests);
+        }
+        return result;
     }
 }
